@@ -76,13 +76,14 @@ public class PortalListener implements Listener {
         Portal.getInstance().getLogger().info(event.getEventName());
         if(event.getAction() == Action.LEFT_CLICK_AIR){
             ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-            if(item.getItemMeta() == null) return;
             int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+            if(stickloc == null) return;
             event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + stickloc[0] + ", Y: " + stickloc[1] + ", Z: " + stickloc[2]);
         } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             BlockState state = event.getClickedBlock().getState();
             if(state instanceof TileState){
                 int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+                if(loc == null) return;
                 event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + loc[0] + ", Y: " + loc[1] + ", Z: " + loc[2]);
             }
         }
@@ -121,7 +122,7 @@ public class PortalListener implements Listener {
                     meta.displayName(TextHelpers.normalText("Unusual Stick"));
                     meta.lore(ImmutableList.of(TextHelpers.italicText("The stick omits faint light...", NamedTextColor.GREEN)));
                     Location loc = st.getLocation();
-                    int[] LOCATION = {(int)loc.getX(), (int)loc.getY(), (int)loc.getZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
+                    int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                     meta.getPersistentDataContainer().set(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
                     item.setItemMeta(meta);
                     item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
@@ -149,7 +150,7 @@ public class PortalListener implements Listener {
                             event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.STICK));
                         } else {
                             Location curLoc = signn.getLocation();
-                            int[] CURLOCATION = {(int)curLoc.getX(), (int)curLoc.getY(), (int)curLoc.getZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
+                            int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
                             TileState rmtstate = (TileState) rmtsign.getState();
                             rmtstate.getPersistentDataContainer().set(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY, CURLOCATION);
                             rmtstate.update();
@@ -171,8 +172,8 @@ public class PortalListener implements Listener {
 
     @EventHandler(ignoreCancelled = false)
     public void onStepIntoPortal(PlayerMoveEvent event){
-        Location blkloc = event.getTo();
-        Location blklocprev = event.getFrom();
+        Location blkloc = event.getTo().clone();
+        Location blklocprev = event.getFrom().clone();
 
         if(blkloc.getBlock().getType() == Material.LAVA && blklocprev.getBlock().getType() != Material.LAVA){
             Block sign = isInPortal(blkloc) == null ? isInPortal(blklocprev) : isInPortal(blkloc);
@@ -220,27 +221,33 @@ public class PortalListener implements Listener {
         Vector tback = new Vector(-1, 0, 0);
         Vector tleft = new Vector(0, 0, -1);
         Vector tright = new Vector(0, 0, 1);
-        Location lmax = loc.add(tleft.multiply(2));
-        Location rmax = loc.add(tright.multiply(2));
-        Location fmax = loc.add(tfront.multiply(2));
-        Location bmax = loc.add(tback.multiply(2));
+        Location lmax = loc.clone().add(tleft.multiply(2));
+        Location rmax = loc.clone().add(tright.multiply(2));
+        Location fmax = loc.clone().add(tfront.multiply(2));
+        Location bmax = loc.clone().add(tback.multiply(2));
+        Portal.getInstance().getLogger().info("ORIGINAL LOCATION: "+loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
+        Portal.getInstance().getLogger().info(lmax.getBlockX() + "," + lmax.getBlockY()+"," + lmax.getBlockZ());
+        Portal.getInstance().getLogger().info(rmax.getBlockX() + "," + rmax.getBlockY()+"," + rmax.getBlockZ());
+        Portal.getInstance().getLogger().info(fmax.getBlockX() + "," + fmax.getBlockY()+"," + fmax.getBlockZ());
+        Portal.getInstance().getLogger().info(bmax.getBlockX() + "," + bmax.getBlockY()+"," + bmax.getBlockZ());
+
         if(lmax.getBlock().getType() == Material.LAVA){
-            Portal.getInstance().getLogger().info("NEAR LAVA");
+            // Portal.getInstance().getLogger().info("NEAR LAVA");
             if(isInPortal(lmax) != null) return lmax;
         }
         else if(rmax.getBlock().getType() == Material.LAVA){
-            Portal.getInstance().getLogger().info("NEAR LAVA");
-            if(isInPortal(rmax) != null) return lmax;
+            // Portal.getInstance().getLogger().info("NEAR LAVA");
+            if(isInPortal(rmax) != null) return rmax;
         }
         else if(fmax.getBlock().getType() == Material.LAVA){
-            Portal.getInstance().getLogger().info("NEAR LAVA");
-            if(isInPortal(fmax) != null) return lmax;
+            // Portal.getInstance().getLogger().info("NEAR LAVA");
+            if(isInPortal(fmax) != null) return fmax;
         }
         else if(bmax.getBlock().getType() == Material.LAVA){
-            Portal.getInstance().getLogger().info("NEAR LAVA");
-            if(isInPortal(bmax) != null) return lmax;
+            // Portal.getInstance().getLogger().info("NEAR LAVA");
+            if(isInPortal(bmax) != null) return bmax;
         } else{
-            Portal.getInstance().getLogger().info("NOT NEAR LAVA");
+            // Portal.getInstance().getLogger().info("NOT NEAR LAVA");
         }
         return null;
     }
@@ -254,72 +261,88 @@ public class PortalListener implements Listener {
         Vector tleft = new Vector(0, 0, -1);
         Vector tright = new Vector(0, 0, 1);
         
-        Location lmax = loc;
+        Location lmax = loc.clone();
         int i = 0;
         while(!(lmax.getBlock().getState().getBlockData() instanceof Stairs) && i < 3){
-            lmax = lmax.add(tleft);
+            lmax.add(tleft);
             i++;
         }
         i = 0;
-        Location rmax = loc;
+        Location rmax = loc.clone();
         while(!(rmax.getBlock().getState().getBlockData() instanceof Stairs) && i < 3){
-            rmax = rmax.add(tright);
+            rmax.add(tright);
             i++;
         }
         i = 0;
-        Location fmax = loc;
+        Location fmax = loc.clone();
         while(!(fmax.getBlock().getState().getBlockData() instanceof Stairs) && i < 3){
-            fmax = fmax.add(tfront);
+            fmax.add(tfront);
             i++;
         }
         i = 0;
-        Location bmax = loc;
+        Location bmax = loc.clone();
         while(!(bmax.getBlock().getState().getBlockData() instanceof Stairs) && i < 3){
-            bmax = bmax.add(tback);
+            bmax.add(tback);
             i++;
         }
-        if((rmax.getZ() - lmax.getZ() > sizelimit+1)||(fmax.getX() - bmax.getX() > sizelimit+1)) return null;
+        // Portal.getInstance().getLogger().info(lmax.getBlockX() + "," + lmax.getBlockY()+"," + lmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(rmax.getBlockX() + "," + rmax.getBlockY()+"," + rmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(fmax.getBlockX() + "," + fmax.getBlockY()+"," + fmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(bmax.getBlockX() + "," + bmax.getBlockY()+"," + bmax.getBlockZ());
+
+
+        if((rmax.getBlockZ() - lmax.getBlockZ() > sizelimit+1)||(fmax.getBlockX() - bmax.getBlockX() > sizelimit+1)) return null;
         
         boolean isPortal = true;
         // check if boundary is made of stairs
-        for(int j = (int)lmax.getZ(); j < (int)rmax.getZ()+1; j++){
-            Location upperBound = new Location(loc.getWorld(), fmax.getX(), loc.getY(), (double)j);
-            Location lowerBound = new Location(loc.getWorld(), bmax.getX(), loc.getY(), (double)j);
+        for(int j = (int)lmax.getBlockZ(); j < (int)rmax.getBlockZ()+1; j++){
+            Location upperBound = new Location(loc.getWorld(), fmax.getBlockX(), loc.getBlockY(), (double)j);
+            Location lowerBound = new Location(loc.getWorld(), bmax.getBlockX(), loc.getBlockY(), (double)j);
             if(!(upperBound.getBlock().getState().getBlockData() instanceof Stairs && lowerBound.getBlock().getState().getBlockData() instanceof Stairs)){
                 isPortal = false;
+                Portal.getInstance().getLogger().info("a");
             }
+            upperBound.getBlock().setType(Material.DIAMOND_BLOCK);
+            lowerBound.getBlock().setType(Material.DIAMOND_BLOCK);
         }
 
-        for(int k = (int)bmax.getZ(); k < (int)fmax.getZ()+1; k++){
-            Location leftBound = new Location(loc.getWorld(), (double)k, loc.getY(), lmax.getZ());
-            Location rightBound = new Location(loc.getWorld(), (double)k, loc.getY(), rmax.getZ());
+        for(int k = (int)bmax.getBlockX(); k < (int)fmax.getBlockX()+1; k++){
+            Location leftBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), lmax.getBlockZ());
+            Location rightBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), rmax.getBlockZ());
             if(!(leftBound.getBlock().getState().getBlockData() instanceof Stairs && rightBound.getBlock().getState().getBlockData() instanceof Stairs)){
                 isPortal = false;
+                Portal.getInstance().getLogger().info("b");
+            leftBound.getBlock().setType(Material.DIAMOND_BLOCK);
+            rightBound.getBlock().setType(Material.DIAMOND_BLOCK);
             }
         }
         // check if filled with lava
-        for(int j = (int)lmax.getZ()+1; j < (int)rmax.getZ(); j++){
-            for(int l = (int)bmax.getX()+1; l < (int)fmax.getX(); l++){
-                Location locacheck = new Location(loc.getWorld(), (double)l, loc.getY(), (double)j);
+        for(int j = (int)lmax.getBlockZ()+1; j < (int)rmax.getBlockZ(); j++){
+            for(int l = (int)bmax.getBlockX()+1; l < (int)fmax.getBlockX(); l++){
+                Location locacheck = new Location(loc.getWorld(), (double)l, loc.getBlockY(), (double)j);
                 if(locacheck.getBlock().getType() != Material.LAVA){
                     isPortal = false;
+                    Portal.getInstance().getLogger().info("c");
                 }
+                locacheck.getBlock().setType(Material.DIAMOND_BLOCK);
+
             }
         }
         // find the associated sign
         if(isPortal){
-            for(int j = (int)lmax.getZ()-1; j < (int)rmax.getZ()+2; j++){
-                Location upperBound = new Location(loc.getWorld(), fmax.getX()+1, loc.getY(), (double)j);
-                Location lowerBound = new Location(loc.getWorld(), bmax.getX()-1, loc.getY(), (double)j);
+            // Portal.getInstance().getLogger().info("IT IS A PORTAL!");
+            for(int j = (int)lmax.getBlockZ()-1; j < (int)rmax.getBlockZ()+2; j++){
+                Location upperBound = new Location(loc.getWorld(), fmax.getBlockX()+1, loc.getBlockY(), (double)j);
+                Location lowerBound = new Location(loc.getWorld(), bmax.getBlockX()-1, loc.getBlockY(), (double)j);
                 Location signloc = (upperBound.getBlock().getState() instanceof Sign) ? upperBound : ((lowerBound.getBlock().getState() instanceof Sign) ? lowerBound : null);
                 if(signloc != null){
                     return signloc.getBlock();
                 }
             }
 
-            for(int k = (int)bmax.getZ()-1; k < (int)fmax.getZ()+2; k++){
-                Location leftBound = new Location(loc.getWorld(), (double)k, loc.getY(), lmax.getZ()-1);
-                Location rightBound = new Location(loc.getWorld(), (double)k, loc.getY(), rmax.getZ()+1);
+            for(int k = (int)bmax.getBlockZ()-1; k < (int)fmax.getBlockZ()+2; k++){
+                Location leftBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), lmax.getBlockZ()-1);
+                Location rightBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), rmax.getBlockZ()+1);
                 Location signloc = (leftBound.getBlock().getState() instanceof Sign) ? leftBound : ((rightBound.getBlock().getState() instanceof Sign) ? rightBound : null);
                 if(signloc != null){
                     return signloc.getBlock();
