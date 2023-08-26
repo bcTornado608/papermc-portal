@@ -1,62 +1,36 @@
 package com.github.bcTornado608.papermcportal.listeners;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.apache.commons.lang3.ArrayUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.TileState;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.sign.Side;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.t;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.joml.Vector3i;
 
 import com.github.bcTornado608.papermcportal.Portal;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
-import com.github.bcTornado608.papermcportal.items.CopperAxe;
-import com.github.bcTornado608.papermcportal.utils.FloatingBlocksHelpers;
 import com.github.bcTornado608.papermcportal.utils.StringHash;
 import com.github.bcTornado608.papermcportal.utils.Teleport;
 import com.github.bcTornado608.papermcportal.utils.TextHelpers;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 import net.kyori.adventure.text.format.NamedTextColor;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.bukkit.Location;
 
 
 /**
