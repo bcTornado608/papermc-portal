@@ -1,0 +1,54 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build plugin jar",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": ["jar"],
+            "group": "build"
+        },
+
+        {
+            "label": "Copy Plugin jar",
+            "type": "shell",
+            "command": "cp",
+            "args": ["build/libs/copper-essentials-plugin.jar", "run/plugins/"],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": "Build plugin jar",
+            "problemMatcher": []
+        },
+
+        {
+            "label": "Start Server with debug",
+            "type": "shell",
+            "command": "java",
+            "args": ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005", "-jar", "paper-1.20.1-164.jar", "nogui"],
+            "options": {
+                "cwd": "run"
+            },
+            "group": "build",
+            "dependsOn": "Copy Plugin jar",
+            "problemMatcher": []
+        },
+
+        {
+            "label": "Start Server",
+            "type": "shell",
+            "command": "java",
+            "args": ["-jar", "paper-1.20.1-164.jar", "nogui"],
+            "options": {
+                "cwd": "run"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "Copy Plugin jar",
+            "problemMatcher": []
+        }
+    ]
+}
