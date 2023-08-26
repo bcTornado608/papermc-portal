@@ -9,4 +9,8 @@ public class Teleport {
         Location location = new Location(world, 39, 63, 36, 0, 0);
         player.teleport(location);
     };
+
+    public static void te(Player player, Location loc){
+        player.teleport(loc);
+    };
 }
