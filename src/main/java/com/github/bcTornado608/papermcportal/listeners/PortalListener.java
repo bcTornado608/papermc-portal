@@ -174,8 +174,8 @@ public class PortalListener implements Listener {
     public void onStepIntoPortal(PlayerMoveEvent event){
         Location blkloc = event.getTo().clone();
         Location blklocprev = event.getFrom().clone();
-        Location cur = event.getPlayer().getLocation();
-        event.getPlayer().sendPlainMessage("You are stepping on: "+cur.add(0, -1, 0).getBlock().getType().toString());
+        // Location cur = event.getPlayer().getLocation();
+        // event.getPlayer().sendPlainMessage("You are stepping on: "+cur.add(0, -1, 0).getBlock().getType().toString());
 
         if(blkloc.getBlock().getType() == Material.LAVA && blklocprev.getBlock().getType() != Material.LAVA){
             Block sign = (isInPortal(blkloc) == null) ? isInPortal(blklocprev) : isInPortal(blkloc);
