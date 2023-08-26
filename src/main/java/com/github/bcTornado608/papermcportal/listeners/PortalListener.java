@@ -71,31 +71,31 @@ public class PortalListener implements Listener {
     //     Teleport.t(event.getPlayer());
     // }
 
-    @EventHandler(ignoreCancelled = false)
-    public void onItemUse(PlayerInteractEvent event){
-        Portal.getInstance().getLogger().info(event.getEventName());
-        if(event.getAction() == Action.LEFT_CLICK_AIR){
-            ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-            int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
-            if(stickloc == null) return;
-            event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + stickloc[0] + ", Y: " + stickloc[1] + ", Z: " + stickloc[2]);
-        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            BlockState state = event.getClickedBlock().getState();
-            if(state instanceof TileState){
-                int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
-                if(loc == null) return;
-                event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + loc[0] + ", Y: " + loc[1] + ", Z: " + loc[2]);
-            }
-        }
-    }
+    // @EventHandler(ignoreCancelled = false)
+    // public void onItemUse(PlayerInteractEvent event){
+    //     Portal.getInstance().getLogger().info(event.getEventName());
+    //     if(event.getAction() == Action.LEFT_CLICK_AIR){
+    //         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+    //         int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+    //         if(stickloc == null) return;
+    //         event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + stickloc[0] + ", Y: " + stickloc[1] + ", Z: " + stickloc[2]);
+    //     } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+    //         BlockState state = event.getClickedBlock().getState();
+    //         if(state instanceof TileState){
+    //             int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+    //             if(loc == null) return;
+    //             event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + loc[0] + ", Y: " + loc[1] + ", Z: " + loc[2]);
+    //         }
+    //     }
+    // }
     
-    @EventHandler(ignoreCancelled = false)
-    public void onItemUseAtEntity(EntityDamageByEntityEvent event){
-        Portal.getInstance().getLogger().info(event.getEventName());
-        if((event.getDamager() instanceof Player) && ((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.STICK){
-            Teleport.t(((Player)event.getDamager()));
-        }
-    }
+    // @EventHandler(ignoreCancelled = false)
+    // public void onItemUseAtEntity(EntityDamageByEntityEvent event){
+    //     Portal.getInstance().getLogger().info(event.getEventName());
+    //     if((event.getDamager() instanceof Player) && ((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.STICK){
+    //         Teleport.t(((Player)event.getDamager()));
+    //     }
+    // }
 
     @EventHandler(ignoreCancelled = true)
     public void onUseSign(PlayerInteractEvent event){
@@ -107,11 +107,11 @@ public class PortalListener implements Listener {
             if(stickloc == null){
                 BlockState st = event.getClickedBlock().getState();
 
-                if(isNearPortal(st.getLocation()) != null){
-                    event.getPlayer().sendPlainMessage("THE SIGN IS NEAR PORTAL");
-                } else {
-                    event.getPlayer().sendPlainMessage("THE SIGN IS NOT NEAR PORTAL");
-                }
+                // if(isNearPortal(st.getLocation()) != null){
+                //     event.getPlayer().sendPlainMessage("THE SIGN IS NEAR PORTAL");
+                // } else {
+                //     event.getPlayer().sendPlainMessage("THE SIGN IS NOT NEAR PORTAL");
+                // }
 
                 // if clicked on a sign near portal
                 if(st instanceof Sign && isNearPortal(st.getLocation()) != null && st instanceof TileState && (((Sign)st).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY) == null)) {
@@ -174,13 +174,15 @@ public class PortalListener implements Listener {
     public void onStepIntoPortal(PlayerMoveEvent event){
         Location blkloc = event.getTo().clone();
         Location blklocprev = event.getFrom().clone();
+        Location cur = event.getPlayer().getLocation();
+        event.getPlayer().sendPlainMessage("You are stepping on: "+cur.add(0, -1, 0).getBlock().getType().toString());
 
         if(blkloc.getBlock().getType() == Material.LAVA && blklocprev.getBlock().getType() != Material.LAVA){
-            Block sign = isInPortal(blkloc) == null ? isInPortal(blklocprev) : isInPortal(blkloc);
+            Block sign = (isInPortal(blkloc) == null) ? isInPortal(blklocprev) : isInPortal(blkloc);
             if(sign == null) return;    
             event.getPlayer().setInvulnerable(true);
             // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-            event.getPlayer().setWalkSpeed((float)1);
+            // event.getPlayer().setWalkSpeed((float)1);
             BlockState st = sign.getState();
             Block rmtsign = null;
             if(st instanceof TileState){
@@ -194,12 +196,12 @@ public class PortalListener implements Listener {
                 event.getPlayer().sendPlainMessage("You stepped into a portal connected to magic web...");
             }
         } else if (blklocprev.getBlock().getType() == Material.LAVA && blkloc.getBlock().getType() != Material.LAVA){
-            Block sign = isInPortal(blkloc) == null ? isInPortal(blklocprev) : isInPortal(blkloc);
+            Block sign = (isInPortal(blkloc) == null) ? isInPortal(blklocprev) : isInPortal(blkloc);
             if(sign == null) return;
 
             event.getPlayer().setInvulnerable(false);
             event.getPlayer().setFireTicks(0);
-            event.getPlayer().setWalkSpeed((float)0.2);
+            // event.getPlayer().setWalkSpeed((float)0.2);
         }
     }
 
@@ -225,11 +227,11 @@ public class PortalListener implements Listener {
         Location rmax = loc.clone().add(tright.multiply(2));
         Location fmax = loc.clone().add(tfront.multiply(2));
         Location bmax = loc.clone().add(tback.multiply(2));
-        Portal.getInstance().getLogger().info("ORIGINAL LOCATION: "+loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
-        Portal.getInstance().getLogger().info(lmax.getBlockX() + "," + lmax.getBlockY()+"," + lmax.getBlockZ());
-        Portal.getInstance().getLogger().info(rmax.getBlockX() + "," + rmax.getBlockY()+"," + rmax.getBlockZ());
-        Portal.getInstance().getLogger().info(fmax.getBlockX() + "," + fmax.getBlockY()+"," + fmax.getBlockZ());
-        Portal.getInstance().getLogger().info(bmax.getBlockX() + "," + bmax.getBlockY()+"," + bmax.getBlockZ());
+        // Portal.getInstance().getLogger().info("ORIGINAL LOCATION: "+loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
+        // Portal.getInstance().getLogger().info(lmax.getBlockX() + "," + lmax.getBlockY()+"," + lmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(rmax.getBlockX() + "," + rmax.getBlockY()+"," + rmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(fmax.getBlockX() + "," + fmax.getBlockY()+"," + fmax.getBlockZ());
+        // Portal.getInstance().getLogger().info(bmax.getBlockX() + "," + bmax.getBlockY()+"," + bmax.getBlockZ());
 
         if(lmax.getBlock().getType() == Material.LAVA){
             // Portal.getInstance().getLogger().info("NEAR LAVA");
@@ -302,8 +304,8 @@ public class PortalListener implements Listener {
                 isPortal = false;
                 Portal.getInstance().getLogger().info("a");
             }
-            upperBound.getBlock().setType(Material.DIAMOND_BLOCK);
-            lowerBound.getBlock().setType(Material.DIAMOND_BLOCK);
+            // upperBound.getBlock().setType(Material.DIAMOND_BLOCK);
+            // lowerBound.getBlock().setType(Material.DIAMOND_BLOCK);
         }
 
         for(int k = (int)bmax.getBlockX(); k < (int)fmax.getBlockX()+1; k++){
@@ -312,9 +314,9 @@ public class PortalListener implements Listener {
             if(!(leftBound.getBlock().getState().getBlockData() instanceof Stairs && rightBound.getBlock().getState().getBlockData() instanceof Stairs)){
                 isPortal = false;
                 Portal.getInstance().getLogger().info("b");
-            leftBound.getBlock().setType(Material.DIAMOND_BLOCK);
-            rightBound.getBlock().setType(Material.DIAMOND_BLOCK);
             }
+            // leftBound.getBlock().setType(Material.DIAMOND_BLOCK);
+            // rightBound.getBlock().setType(Material.DIAMOND_BLOCK);
         }
         // check if filled with lava
         for(int j = (int)lmax.getBlockZ()+1; j < (int)rmax.getBlockZ(); j++){
@@ -324,13 +326,13 @@ public class PortalListener implements Listener {
                     isPortal = false;
                     Portal.getInstance().getLogger().info("c");
                 }
-                locacheck.getBlock().setType(Material.DIAMOND_BLOCK);
+                // locacheck.getBlock().setType(Material.DIAMOND_BLOCK);
 
             }
         }
         // find the associated sign
         if(isPortal){
-            // Portal.getInstance().getLogger().info("IT IS A PORTAL!");
+            Portal.getInstance().getLogger().info("IT IS A PORTAL!");
             for(int j = (int)lmax.getBlockZ()-1; j < (int)rmax.getBlockZ()+2; j++){
                 Location upperBound = new Location(loc.getWorld(), fmax.getBlockX()+1, loc.getBlockY(), (double)j);
                 Location lowerBound = new Location(loc.getWorld(), bmax.getBlockX()-1, loc.getBlockY(), (double)j);
@@ -340,7 +342,7 @@ public class PortalListener implements Listener {
                 }
             }
 
-            for(int k = (int)bmax.getBlockZ()-1; k < (int)fmax.getBlockZ()+2; k++){
+            for(int k = (int)bmax.getBlockX()-1; k < (int)fmax.getBlockX()+2; k++){
                 Location leftBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), lmax.getBlockZ()-1);
                 Location rightBound = new Location(loc.getWorld(), (double)k, loc.getBlockY(), rmax.getBlockZ()+1);
                 Location signloc = (leftBound.getBlock().getState() instanceof Sign) ? leftBound : ((rightBound.getBlock().getState() instanceof Sign) ? rightBound : null);
