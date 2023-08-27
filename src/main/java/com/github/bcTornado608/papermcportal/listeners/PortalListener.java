@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 
 import com.github.bcTornado608.papermcportal.Portal;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
+import com.github.bcTornado608.papermcportal.items.Normal_stick;
 import com.github.bcTornado608.papermcportal.utils.StringHash;
 import com.github.bcTornado608.papermcportal.utils.Teleport;
 import com.github.bcTornado608.papermcportal.utils.TextHelpers;
@@ -78,7 +79,7 @@ public class PortalListener implements Listener {
         ItemMeta met = item.getItemMeta();
         int[] stickloc = null;
         if(met!=null) stickloc = met.getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
-        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && item.getType() == Material.STICK) {
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && Normal_stick.isItem(item)) {
             // if stick is not connected to any portal yet
             if(stickloc == null){
                 BlockState st = event.getClickedBlock().getState();
@@ -123,7 +124,7 @@ public class PortalListener implements Listener {
                         Block rmtsign = location.getBlock();
                         if(!(rmtsign.getState() instanceof Sign)){
                             event.getPlayer().sendPlainMessage("The light dies down within your hand...");
-                            event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.STICK));
+                            event.getPlayer().getInventory().setItemInMainHand(Normal_stick.getItemStack(1));
                         } else {
                             Location curLoc = signn.getLocation();
                             int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
@@ -133,7 +134,7 @@ public class PortalListener implements Listener {
                         }
 
                         event.getPlayer().sendPlainMessage("An stream of abnormal energy flows out of the stick in your hand...");
-                        event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.STICK));
+                        event.getPlayer().getInventory().setItemInMainHand(Normal_stick.getItemStack(1));
                     } else {
                         event.getPlayer().sendPlainMessage("Nothing happens...");
                     }
