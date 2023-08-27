@@ -57,11 +57,12 @@ public class PortalListener implements Listener {
     @EventHandler(ignoreCancelled = false)
     public void onItemUse(PlayerInteractEvent event){
         Portal.getInstance().getLogger().info(event.getEventName());
-        if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
+        if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
             ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
             if(!Teleportation_scroll.isItem(item)) return;
             int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
             if(scrollLoc == null) return;
+            if(event.getPlayer().getTargetBlock(null, 30).getState() instanceof Sign) return;
             // teleports player to destination specified in the scroll
             event.getPlayer().setInvulnerable(true);
             // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
@@ -85,38 +86,38 @@ public class PortalListener implements Listener {
         }
     }
     
-    @EventHandler(ignoreCancelled = false)
-    public void onItemUseAtEntity(EntityDamageByEntityEvent event){
-        Portal.getInstance().getLogger().info(event.getEventName());
-        if((event.getDamager() instanceof Player) && (Teleportation_scroll.isItem(((Player)event.getDamager()).getInventory().getItemInMainHand()))){
-            Player p = (Player)event.getDamager();
-            // teleports player to destination specified in the scroll
-            ItemStack item = p.getInventory().getItemInMainHand();
-            if(!Teleportation_scroll.isItem(item)) return;
-            int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
-            if(scrollLoc == null) return;
-            // teleports player to destination specified in the scroll
-            p.setInvulnerable(true);
-            // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-            // p.setWalkSpeed((float)1);
-            Block rmtsign = null;
-            Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
-            rmtsign = location.getBlock();
+    // @EventHandler(ignoreCancelled = false)
+    // public void onItemUseAtEntity(EntityDamageByEntityEvent event){
+    //     Portal.getInstance().getLogger().info(event.getEventName());
+    //     if((event.getDamager() instanceof Player) && (Teleportation_scroll.isItem(((Player)event.getDamager()).getInventory().getItemInMainHand()))){
+    //         Player p = (Player)event.getDamager();
+    //         // teleports player to destination specified in the scroll
+    //         ItemStack item = p.getInventory().getItemInMainHand();
+    //         if(!Teleportation_scroll.isItem(item)) return;
+    //         int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+    //         if(scrollLoc == null) return;
+    //         // teleports player to destination specified in the scroll
+    //         p.setInvulnerable(true);
+    //         // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+    //         // p.setWalkSpeed((float)1);
+    //         Block rmtsign = null;
+    //         Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+    //         rmtsign = location.getBlock();
 
-            if(rmtsign != null){
-                Location destination = isNearPortal(rmtsign.getLocation());
-                if(destination == null){
-                    return;
-                }
-                Teleport.te(p, destination);
-                p.sendPlainMessage("Magic of the item in your hand dies down...");
-                ItemStack mhItem = p.getInventory().getItemInMainHand();
-                mhItem.setAmount(mhItem.getAmount()-1);
-                // p.getInventory().addItem(new ItemStack(Material.PAPER, 1));
-                addToPlayerInv(p, new ItemStack(Material.PAPER, 1));
-            }
-        }
-    }
+    //         if(rmtsign != null){
+    //             Location destination = isNearPortal(rmtsign.getLocation());
+    //             if(destination == null){
+    //                 return;
+    //             }
+    //             Teleport.te(p, destination);
+    //             p.sendPlainMessage("Magic of the item in your hand dies down...");
+    //             ItemStack mhItem = p.getInventory().getItemInMainHand();
+    //             mhItem.setAmount(mhItem.getAmount()-1);
+    //             // p.getInventory().addItem(new ItemStack(Material.PAPER, 1));
+    //             addToPlayerInv(p, new ItemStack(Material.PAPER, 1));
+    //         }
+    //     }
+    // }
 
     @EventHandler(ignoreCancelled = true)
     public void onUseSign(PlayerInteractEvent event){
@@ -200,8 +201,8 @@ public class PortalListener implements Listener {
                 String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
                 event.getPlayer().sendPlainMessage(lines[0]);
                 //
-                item.setAmount(item.getAmount()-1);
                 ItemStack newitem = Teleportation_scroll.isItem(item)? Teleportation_scroll.getItemStack(1) : ((Undying_scroll.isItem(item)) ? Undying_scroll.getItemStack(1) : null);
+                item.setAmount(item.getAmount()-1);
                 ItemMeta meta = newitem.getItemMeta();
                 
                 meta.lore(ImmutableList.of(TextHelpers.italicText(lines[0], NamedTextColor.RED)));
