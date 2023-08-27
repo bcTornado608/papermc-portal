@@ -75,7 +75,9 @@ public class PortalListener implements Listener {
     public void onUseSign(PlayerInteractEvent event){
         // Creates teleport wand
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-        int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+        ItemMeta met = item.getItemMeta();
+        int[] stickloc = null;
+        if(met!=null) stickloc = met.getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK && item.getType() == Material.STICK) {
             // if stick is not connected to any portal yet
             if(stickloc == null){
