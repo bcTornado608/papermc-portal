@@ -161,11 +161,17 @@ public class PortalListener implements Listener {
             Block rmtsign = null;
             if(st instanceof TileState){
                 int[] locArr = ((TileState)st).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+                if(locArr == null){
+                    return;
+                }
                 Location location = new Location(event.getPlayer().getWorld(), locArr[0], locArr[1], locArr[2], locArr[3], locArr[4]);
                 rmtsign = location.getBlock();
             }
             if(rmtsign != null){
                 Location destination = isNearPortal(rmtsign.getLocation());
+                if(destination == null){
+                    return;
+                }
                 Teleport.te(event.getPlayer(), destination);
                 event.getPlayer().sendPlainMessage("You stepped into a portal connected to magic web...");
             }
