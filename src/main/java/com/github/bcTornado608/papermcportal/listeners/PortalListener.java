@@ -75,7 +75,9 @@ public class PortalListener implements Listener {
                 }
                 Teleport.te(event.getPlayer(), destination);
                 event.getPlayer().sendPlainMessage("Magic of the item in your hand dies down...");
-                event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.PAPER, 1));
+                ItemStack mhItem = event.getPlayer().getInventory().getItemInMainHand();
+                mhItem.setAmount(mhItem.getAmount()-1);
+                event.getPlayer().getInventory().addItem(new ItemStack(Material.PAPER, 1));
             }
         }
     }
@@ -105,7 +107,9 @@ public class PortalListener implements Listener {
                 }
                 Teleport.te(p, destination);
                 p.sendPlainMessage("Magic of the item in your hand dies down...");
-                p.getInventory().setItemInMainHand(new ItemStack(Material.PAPER, 1));
+                ItemStack mhItem = p.getInventory().getItemInMainHand();
+                mhItem.setAmount(mhItem.getAmount()-1);
+                p.getInventory().addItem(new ItemStack(Material.PAPER, 1));
             }
         }
     }
@@ -127,14 +131,17 @@ public class PortalListener implements Listener {
                     event.getPlayer().sendPlainMessage("The stick in your hand glows abnormally...");
                     String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
                     event.getPlayer().sendPlainMessage(lines[0]);
-                    ItemMeta meta = item.getItemMeta();
+                    item.setAmount(item.getAmount()-1);
+                    ItemStack newitem = Normal_stick.getItemStack(1);
+                    ItemMeta meta = newitem.getItemMeta();
                     meta.displayName(TextHelpers.italicText("\"Unusual Stick\"", NamedTextColor.GOLD));
                     meta.lore(ImmutableList.of(TextHelpers.italicText("The stick omits faint light...", NamedTextColor.RED)));
                     Location loc = st.getLocation();
                     int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                     meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
-                    item.setItemMeta(meta);
-                    item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+                    newitem.setItemMeta(meta);
+                    newitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+                    event.getPlayer().getInventory().addItem(newitem);
                 } else {
                     event.getPlayer().sendPlainMessage("Nothing happens...");
                 }
@@ -156,7 +163,7 @@ public class PortalListener implements Listener {
                         Block rmtsign = location.getBlock();
                         if(!(rmtsign.getState() instanceof Sign)){
                             event.getPlayer().sendPlainMessage("The light dies down within your hand...");
-                            event.getPlayer().getInventory().setItemInMainHand(Normal_stick.getItemStack(1));
+                            event.getPlayer().getInventory().setItemInMainHand(Normal_stick.getItemStack(event.getPlayer().getInventory().getItemInMainHand().getAmount()));
                         } else {
                             Location curLoc = signn.getLocation();
                             int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
@@ -166,7 +173,9 @@ public class PortalListener implements Listener {
                         }
 
                         event.getPlayer().sendPlainMessage("An stream of abnormal energy flows out of the stick in your hand...");
-                        event.getPlayer().getInventory().setItemInMainHand(Normal_stick.getItemStack(1));
+                        item.setAmount(item.getAmount()-1);
+                        ItemStack newitem = Normal_stick.getItemStack(1);
+                        event.getPlayer().getInventory().addItem(newitem);
                     } else {
                         event.getPlayer().sendPlainMessage("Nothing happens...");
                     }
@@ -332,9 +341,7 @@ public class PortalListener implements Listener {
             }
         }
     }
-    public void useScrollofUndying(){
-        
-    }
+
     // If the location is near a portal
     /*              X
      *              |

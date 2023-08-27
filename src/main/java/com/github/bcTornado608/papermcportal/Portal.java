@@ -68,7 +68,7 @@ public class Portal extends JavaPlugin implements Listener{
         getServer().addRecipe(recipe2);
 
         // Undying scroll
-        ShapedRecipe recipe3 = new ShapedRecipe(CommonConstants.TELEPORTATION_SCROLL_RECIPE_KEY, Undying_scroll.getItemStack(1));
+        ShapedRecipe recipe3 = new ShapedRecipe(CommonConstants.UNDYING_SCROLL_RECIPE_KEY, Undying_scroll.getItemStack(1));
         recipe3.shape(
                 " E ",
                 " T ",
@@ -76,7 +76,6 @@ public class Portal extends JavaPlugin implements Listener{
         recipe3.setIngredient('E', Material.ENDER_EYE);
         recipe3.setIngredient('P', Material.PAPER);
         recipe3.setIngredient('T', Material.TOTEM_OF_UNDYING);
-        getServer().removeRecipe(CommonConstants.TELEPORTATION_SCROLL_RECIPE_KEY);
         getServer().addRecipe(recipe3);
     }
 }
