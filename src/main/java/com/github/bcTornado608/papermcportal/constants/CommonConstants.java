@@ -17,11 +17,15 @@ public class CommonConstants {
     public static final String TELEPORTATION_SCROLL_RECIPE = "teleportation_scroll";
     public static NamespacedKey TELEPORTATION_SCROLL_RECIPE_KEY = null;
 
+    public static final String UNDYING_SCROLL_RECIPE = "undying_scroll";
+    public static NamespacedKey UNDYING_SCROLL_RECIPE_KEY = null;
+
 
     public static void initializeConstants(Plugin plugin){
         ITEM_ID_KEY = new NamespacedKey(plugin, ITEM_ID);
         LOC_STORE_KEY = new NamespacedKey(plugin, LOC_STORE);
         NORMAL_STICK_RECIPE_KEY = new NamespacedKey(plugin, NORMAL_STICK_RECIPE);
         TELEPORTATION_SCROLL_RECIPE_KEY = new NamespacedKey(plugin, TELEPORTATION_SCROLL_RECIPE);
+        UNDYING_SCROLL_RECIPE_KEY = new NamespacedKey(plugin, UNDYING_SCROLL_RECIPE);
     }
 }

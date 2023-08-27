@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
 import com.github.bcTornado608.papermcportal.items.Normal_stick;
 import com.github.bcTornado608.papermcportal.items.Teleportation_scroll;
+import com.github.bcTornado608.papermcportal.items.Undying_scroll;
 import com.github.bcTornado608.papermcportal.listeners.PortalListener;
 
 
@@ -65,5 +66,17 @@ public class Portal extends JavaPlugin implements Listener{
         recipe2.setIngredient('E', Material.ENDER_EYE);
         recipe2.setIngredient('P', Material.PAPER);
         getServer().addRecipe(recipe2);
+
+        // Undying scroll
+        ShapedRecipe recipe3 = new ShapedRecipe(CommonConstants.TELEPORTATION_SCROLL_RECIPE_KEY, Undying_scroll.getItemStack(1));
+        recipe3.shape(
+                " E ",
+                " T ",
+                " P ");
+        recipe3.setIngredient('E', Material.ENDER_EYE);
+        recipe3.setIngredient('P', Material.PAPER);
+        recipe3.setIngredient('T', Material.TOTEM_OF_UNDYING);
+        getServer().removeRecipe(CommonConstants.TELEPORTATION_SCROLL_RECIPE_KEY);
+        getServer().addRecipe(recipe3);
     }
 }

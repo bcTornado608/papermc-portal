@@ -16,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +31,7 @@ import com.github.bcTornado608.papermcportal.Portal;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
 import com.github.bcTornado608.papermcportal.items.Normal_stick;
 import com.github.bcTornado608.papermcportal.items.Teleportation_scroll;
+import com.github.bcTornado608.papermcportal.items.Undying_scroll;
 import com.github.bcTornado608.papermcportal.utils.StringHash;
 import com.github.bcTornado608.papermcportal.utils.Teleport;
 import com.github.bcTornado608.papermcportal.utils.TextHelpers;
@@ -173,7 +176,7 @@ public class PortalListener implements Listener {
                 }
             }
             event.setCancelled(true);
-        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Teleportation_scroll.isItem(item)) {
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && (Teleportation_scroll.isItem(item) || Undying_scroll.isItem(item))) {
             // Player enchants a teleportation scroll
             BlockState st = event.getClickedBlock().getState();
             // if clicked on a sign near portal
@@ -187,11 +190,11 @@ public class PortalListener implements Listener {
                 int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                 meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
                 item.setItemMeta(meta);
-                item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+                item.addUnsafeEnchantment(Enchantment.LUCK, 1);
             } else {
                 event.getPlayer().sendPlainMessage("Nothing happens...");
             }
-
+            event.setCancelled(true);
         }
     }
 
@@ -237,6 +240,101 @@ public class PortalListener implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDeath(EntityDamageEvent event){
+        if(event.getEntity() instanceof Player){
+            Player p = (Player) event.getEntity();
+            if(p.getHealth() < event.getDamage()) {
+                ItemStack[] inv = p.getInventory().getStorageContents();
+                ItemStack it = p.getInventory().getItemInOffHand();
+                ItemStack[] itarm = p.getInventory().getArmorContents();
+                for(ItemStack is : inv){
+                    if(is != null && is.getAmount() > 0 && Undying_scroll.isItem(is)){
+                        // use undying scroll
+                        int[] scrollLoc = is.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+                        if(scrollLoc == null) continue;
+                        // teleports player to destination specified in the scroll
+                        p.setInvulnerable(true);
+                        // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                        // p.setWalkSpeed((float)1);
+                        Block rmtsign = null;
+                        Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                        rmtsign = location.getBlock();
+
+                        if(rmtsign != null){
+                            Location destination = isNearPortal(rmtsign.getLocation());
+                            if(destination == null){
+                                return;
+                            }
+                            Teleport.te(p, destination);
+                            p.setHealth(0.5);
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
+                            p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
+                        }
+                        is.setAmount(is.getAmount()-1);
+                        event.setCancelled(true);
+                        break;
+                    }
+                }
+                for(ItemStack is : itarm){
+                    if(is != null && is.getAmount() > 0 && Undying_scroll.isItem(is)){
+                        // use undying scroll
+                        int[] scrollLoc = is.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+                        if(scrollLoc == null) continue;
+                        // teleports player to destination specified in the scroll
+                        p.setInvulnerable(true);
+                        // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                        // p.setWalkSpeed((float)1);
+                        Block rmtsign = null;
+                        Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                        rmtsign = location.getBlock();
+
+                        if(rmtsign != null){
+                            Location destination = isNearPortal(rmtsign.getLocation());
+                            if(destination == null){
+                                return;
+                            }
+                            Teleport.te(p, destination);
+                            p.setHealth(0.5);
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
+                            p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
+                        }
+                        is.setAmount(is.getAmount()-1);
+                        event.setCancelled(true);
+                        break;
+                    }
+                }
+                if(it != null && it.getAmount() > 0 && Undying_scroll.isItem(it)){
+                    // use undying scroll
+                    int[] scrollLoc = it.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+                    if(scrollLoc == null) return;
+                    // teleports player to destination specified in the scroll
+                    p.setInvulnerable(true);
+                    // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                    // p.setWalkSpeed((float)1);
+                    Block rmtsign = null;
+                    Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                    rmtsign = location.getBlock();
+
+                    if(rmtsign != null){
+                        Location destination = isNearPortal(rmtsign.getLocation());
+                        if(destination == null){
+                            return;
+                        }
+                        Teleport.te(p, destination);
+                        p.setHealth(0.5);
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
+                        p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
+                    }
+                    it.setAmount(it.getAmount()-1);
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+    public void useScrollofUndying(){
+        
+    }
     // If the location is near a portal
     /*              X
      *              |
