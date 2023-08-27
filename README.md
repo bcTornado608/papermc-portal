@@ -42,14 +42,18 @@ To connect two portals, rename the sign to the portal name (only the first line 
    
 
 Right click the sign next to another portal with the "Unusual Stick" will connect the two portals.  
-Note that the two signs must have the same first line (portal name).
+Note that the two signs must have the same first line (portal name).  
+The "Unusual Stick" will turn back to "Normal Stick".
+
 
 ### Using teleportation scroll
-Right click on a sign next to a portal with the teleportation scroll to activate it, right click anywhere (including interactable blocks!) with the scroll to use it.
+Right click on a sign next to a portal with the teleportation scroll to activate it, right click anywhere (including interactable blocks!) with the scroll to use it.  
+The teleportation scroll will then disappear.
 
 ### Using scroll of undying
 To use scroll of undying, simply right click with it on a sign next to a portal.
 Then, simply put it in your inventory (you don't have to hold it in your off hand).  
 
-When your health bar fully depletes, you will be teleported back to the portal, and be assigned 2 minutes of regen and absorption.
+When your health bar fully depletes, you will be teleported back to the portal, and be assigned 2 minutes of regen and absorption.  
+The scroll of undying will then turn back to normal paper.
 
