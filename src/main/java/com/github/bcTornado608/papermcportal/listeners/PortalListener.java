@@ -51,13 +51,13 @@ public class PortalListener implements Listener {
     //     Portal.getInstance().getLogger().info(event.getEventName());
     //     if(event.getAction() == Action.LEFT_CLICK_AIR){
     //         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-    //         int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+    //         int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
     //         if(stickloc == null) return;
     //         event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + stickloc[0] + ", Y: " + stickloc[1] + ", Z: " + stickloc[2]);
     //     } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
     //         BlockState state = event.getClickedBlock().getState();
     //         if(state instanceof TileState){
-    //             int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+    //             int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
     //             if(loc == null) return;
     //             event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + loc[0] + ", Y: " + loc[1] + ", Z: " + loc[2]);
     //         }
@@ -78,7 +78,7 @@ public class PortalListener implements Listener {
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
         ItemMeta met = item.getItemMeta();
         int[] stickloc = null;
-        if(met!=null) stickloc = met.getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+        if(met!=null) stickloc = met.getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK && Normal_stick.isItem(item)) {
             // if stick is not connected to any portal yet
             if(stickloc == null){
@@ -91,16 +91,16 @@ public class PortalListener implements Listener {
                 // }
 
                 // if clicked on a sign near portal
-                if(st instanceof Sign && isNearPortal(st.getLocation()) != null && st instanceof TileState && (((Sign)st).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY) == null)) {
+                if(st instanceof Sign && isNearPortal(st.getLocation()) != null && st instanceof TileState && (((Sign)st).getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY) == null)) {
                     event.getPlayer().sendPlainMessage("The stick in your hand glows abnormally...");
                     String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
                     event.getPlayer().sendPlainMessage(lines[0]);
                     ItemMeta meta = item.getItemMeta();
-                    meta.displayName(TextHelpers.normalText("Unusual Stick"));
-                    meta.lore(ImmutableList.of(TextHelpers.italicText("The stick omits faint light...", NamedTextColor.GREEN)));
+                    meta.displayName(TextHelpers.italicText("\"Unusual Stick\"", NamedTextColor.GOLD));
+                    meta.lore(ImmutableList.of(TextHelpers.italicText("The stick omits faint light...", NamedTextColor.RED)));
                     Location loc = st.getLocation();
                     int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
-                    meta.getPersistentDataContainer().set(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
+                    meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
                     item.setItemMeta(meta);
                     item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
                 } else {
@@ -115,10 +115,10 @@ public class PortalListener implements Listener {
                     TileState state = (TileState) signn.getState();
                     Location location = new Location(event.getPlayer().getWorld(), stickloc[0], stickloc[1], stickloc[2], stickloc[3], stickloc[4]);
                     // if sign matches and is not already occupied
-                    if(stickloc[5] == StringHash.hash(lines[0]) && (state.getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY) == null) && !(location.getBlock().equals(st.getBlock()))){
+                    if(stickloc[5] == StringHash.hash(lines[0]) && (state.getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY) == null) && !(location.getBlock().equals(st.getBlock()))){
                         /* setup the portal here */
                         // sets current sign state
-                        state.getPersistentDataContainer().set(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY, stickloc);
+                        state.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, stickloc);
                         state.update();
                         // sets remote sign state
                         Block rmtsign = location.getBlock();
@@ -129,7 +129,7 @@ public class PortalListener implements Listener {
                             Location curLoc = signn.getLocation();
                             int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
                             TileState rmtstate = (TileState) rmtsign.getState();
-                            rmtstate.getPersistentDataContainer().set(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY, CURLOCATION);
+                            rmtstate.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, CURLOCATION);
                             rmtstate.update();
                         }
 
@@ -163,7 +163,7 @@ public class PortalListener implements Listener {
             BlockState st = sign.getState();
             Block rmtsign = null;
             if(st instanceof TileState){
-                int[] locArr = ((TileState)st).getPersistentDataContainer().get(CommonConstants.ITEM_ID_KEY, PersistentDataType.INTEGER_ARRAY);
+                int[] locArr = ((TileState)st).getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
                 if(locArr == null){
                     return;
                 }
