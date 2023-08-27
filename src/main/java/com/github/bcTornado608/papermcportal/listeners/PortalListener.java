@@ -181,7 +181,7 @@ public class PortalListener implements Listener {
 
             event.getPlayer().setInvulnerable(false);
             event.getPlayer().setFireTicks(0);
-            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 100, 1));
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 360, 1));
             // event.getPlayer().setWalkSpeed((float)0.2);
         }
     }
