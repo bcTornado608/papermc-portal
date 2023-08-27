@@ -13,7 +13,7 @@
             "label": "Copy Plugin jar",
             "type": "shell",
             "command": "cp",
-            "args": ["build/libs/copper-essentials-plugin.jar", "run/plugins/"],
+            "args": ["build/libs/portal-plugin.jar", "run/plugins/"],
             "group": {
                 "kind": "build",
                 "isDefault": false
