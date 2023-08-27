@@ -51,5 +51,5 @@ Right click on a sign next to a portal with the teleportation scroll to activate
 To use scroll of undying, simply right click with it on a sign next to a portal.
 Then, simply put it in your inventory (you don't have to hold it in your off hand).  
 
-When your health bar depletes, you will be teleported back to the portal, and be assigned 2 minutes of regen.
+When your health bar fully depletes, you will be teleported back to the portal, and be assigned 2 minutes of regen and absorption.
 
