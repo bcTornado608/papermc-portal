@@ -71,7 +71,7 @@ public class PortalListener implements Listener {
             // add negative effect for using scroll
             Set<PotionEffect> effects = new HashSet<PotionEffect>();
             effects.add(new PotionEffect(PotionEffectType.POISON, 20*5, 2));            
-            effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*10, 2));            
+            effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*20, 2));            
             effects.add(new PotionEffect(PotionEffectType.GLOWING, 20*60*2, 2));    
             effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*5, 2));            
             effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*60*2, 2));            
@@ -303,7 +303,7 @@ public class PortalListener implements Listener {
                             Teleport.te(p, destination);
                             p.setHealth(0.5);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
-                            p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*60*2, 2));
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*60*2, 5));
                             p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
                         }
                         is.setAmount(is.getAmount()-1);
