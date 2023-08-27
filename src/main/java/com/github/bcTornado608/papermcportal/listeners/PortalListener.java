@@ -1,6 +1,9 @@
 package com.github.bcTornado608.papermcportal.listeners;
 
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,7 +79,8 @@ public class PortalListener implements Listener {
                 event.getPlayer().sendPlainMessage("Magic of the item in your hand dies down...");
                 ItemStack mhItem = event.getPlayer().getInventory().getItemInMainHand();
                 mhItem.setAmount(mhItem.getAmount()-1);
-                event.getPlayer().getInventory().addItem(new ItemStack(Material.PAPER, 1));
+                // event.getPlayer().getInventory().addItem(new ItemStack(Material.PAPER, 1));
+                addToPlayerInv(event.getPlayer(), new ItemStack(Material.PAPER, 1));
             }
         }
     }
@@ -109,7 +112,8 @@ public class PortalListener implements Listener {
                 p.sendPlainMessage("Magic of the item in your hand dies down...");
                 ItemStack mhItem = p.getInventory().getItemInMainHand();
                 mhItem.setAmount(mhItem.getAmount()-1);
-                p.getInventory().addItem(new ItemStack(Material.PAPER, 1));
+                // p.getInventory().addItem(new ItemStack(Material.PAPER, 1));
+                addToPlayerInv(p, new ItemStack(Material.PAPER, 1));
             }
         }
     }
@@ -141,7 +145,8 @@ public class PortalListener implements Listener {
                     meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
                     newitem.setItemMeta(meta);
                     newitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
-                    event.getPlayer().getInventory().addItem(newitem);
+                    // event.getPlayer().getInventory().addItem(newitem);
+                    addToPlayerInv(event.getPlayer(), newitem);
                 } else {
                     event.getPlayer().sendPlainMessage("Nothing happens...");
                 }
@@ -175,7 +180,8 @@ public class PortalListener implements Listener {
                         event.getPlayer().sendPlainMessage("An stream of abnormal energy flows out of the stick in your hand...");
                         item.setAmount(item.getAmount()-1);
                         ItemStack newitem = Normal_stick.getItemStack(1);
-                        event.getPlayer().getInventory().addItem(newitem);
+                        // event.getPlayer().getInventory().addItem(newitem);
+                        addToPlayerInv(event.getPlayer(), newitem);
                     } else {
                         event.getPlayer().sendPlainMessage("Nothing happens...");
                     }
@@ -193,13 +199,19 @@ public class PortalListener implements Listener {
                 event.getPlayer().sendPlainMessage("Magic flows in your hand...");
                 String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
                 event.getPlayer().sendPlainMessage(lines[0]);
-                ItemMeta meta = item.getItemMeta();
+                //
+                item.setAmount(item.getAmount()-1);
+                ItemStack newitem = Teleportation_scroll.isItem(item)? Teleportation_scroll.getItemStack(1) : ((Undying_scroll.isItem(item)) ? Undying_scroll.getItemStack(1) : null);
+                ItemMeta meta = newitem.getItemMeta();
+                
                 meta.lore(ImmutableList.of(TextHelpers.italicText(lines[0], NamedTextColor.RED)));
                 Location loc = st.getLocation();
                 int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                 meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
-                item.setItemMeta(meta);
-                item.addUnsafeEnchantment(Enchantment.LUCK, 1);
+                newitem.setItemMeta(meta);
+                newitem.addUnsafeEnchantment(Enchantment.LUCK, 1);
+                // event.getPlayer().getInventory().addItem(newitem);
+                addToPlayerInv(event.getPlayer(), newitem);
             } else {
                 event.getPlayer().sendPlainMessage("Nothing happens...");
             }
@@ -342,6 +354,14 @@ public class PortalListener implements Listener {
         }
     }
 
+
+    public void addToPlayerInv(Player p, ItemStack itemStack){
+        HashMap<Integer, ItemStack> nope = p.getInventory().addItem(itemStack);
+        for(Entry<Integer, ItemStack> entry : nope.entrySet())
+        {   
+            p.getWorld().dropItemNaturally(p.getLocation(), entry.getValue());
+        }
+    }
     // If the location is near a portal
     /*              X
      *              |
