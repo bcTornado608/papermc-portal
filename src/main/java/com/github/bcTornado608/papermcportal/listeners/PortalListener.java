@@ -2,6 +2,9 @@ package com.github.bcTornado608.papermcportal.listeners;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -65,6 +68,15 @@ public class PortalListener implements Listener {
             if(event.getPlayer().getTargetBlock(null, 30).getState() instanceof Sign) return;
             // teleports player to destination specified in the scroll
             event.getPlayer().setInvulnerable(true);
+            // add negative effect for using scroll
+            Set<PotionEffect> effects = new HashSet<PotionEffect>();
+            effects.add(new PotionEffect(PotionEffectType.POISON, 20*5, 2));            
+            effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*10, 2));            
+            effects.add(new PotionEffect(PotionEffectType.GLOWING, 20*60*2, 2));    
+            effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*5, 2));            
+            effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*60*2, 2));            
+            effects.add(new PotionEffect(PotionEffectType.WITHER, 20*10, 2));            
+            event.getPlayer().addPotionEffects(effects);
             // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
             // event.getPlayer().setWalkSpeed((float)1);
             Block rmtsign = null;
@@ -291,6 +303,7 @@ public class PortalListener implements Listener {
                             Teleport.te(p, destination);
                             p.setHealth(0.5);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*60*2, 2));
                             p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
                         }
                         is.setAmount(is.getAmount()-1);
