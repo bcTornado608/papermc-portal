@@ -1,9 +1,5 @@
 package com.github.bcTornado608.papermcportal.constants;
 
-
-
-import java.util.jar.Attributes.Name;
-
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
@@ -18,10 +14,14 @@ public class CommonConstants {
     public static final String NORMAL_STICK_RECIPE = "normal_stick";
     public static NamespacedKey NORMAL_STICK_RECIPE_KEY = null;
 
+    public static final String TELEPORTATION_SCROLL_RECIPE = "teleportation_scroll";
+    public static NamespacedKey TELEPORTATION_SCROLL_RECIPE_KEY = null;
+
 
     public static void initializeConstants(Plugin plugin){
         ITEM_ID_KEY = new NamespacedKey(plugin, ITEM_ID);
         LOC_STORE_KEY = new NamespacedKey(plugin, LOC_STORE);
         NORMAL_STICK_RECIPE_KEY = new NamespacedKey(plugin, NORMAL_STICK_RECIPE);
+        TELEPORTATION_SCROLL_RECIPE_KEY = new NamespacedKey(plugin, TELEPORTATION_SCROLL_RECIPE);
     }
 }

@@ -11,9 +11,11 @@ import org.bukkit.block.TileState;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.sign.Side;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +28,7 @@ import org.bukkit.util.Vector;
 import com.github.bcTornado608.papermcportal.Portal;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
 import com.github.bcTornado608.papermcportal.items.Normal_stick;
+import com.github.bcTornado608.papermcportal.items.Teleportation_scroll;
 import com.github.bcTornado608.papermcportal.utils.StringHash;
 import com.github.bcTornado608.papermcportal.utils.Teleport;
 import com.github.bcTornado608.papermcportal.utils.TextHelpers;
@@ -46,31 +49,63 @@ public class PortalListener implements Listener {
     //     Teleport.t(event.getPlayer());
     // }
 
-    // @EventHandler(ignoreCancelled = false)
-    // public void onItemUse(PlayerInteractEvent event){
-    //     Portal.getInstance().getLogger().info(event.getEventName());
-    //     if(event.getAction() == Action.LEFT_CLICK_AIR){
-    //         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-    //         int[] stickloc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
-    //         if(stickloc == null) return;
-    //         event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + stickloc[0] + ", Y: " + stickloc[1] + ", Z: " + stickloc[2]);
-    //     } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-    //         BlockState state = event.getClickedBlock().getState();
-    //         if(state instanceof TileState){
-    //             int[] loc = ((TileState)state).getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
-    //             if(loc == null) return;
-    //             event.getPlayer().sendPlainMessage("TELEPORTABLE:: X: " + loc[0] + ", Y: " + loc[1] + ", Z: " + loc[2]);
-    //         }
-    //     }
-    // }
+    @EventHandler(ignoreCancelled = false)
+    public void onItemUse(PlayerInteractEvent event){
+        Portal.getInstance().getLogger().info(event.getEventName());
+        if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
+            ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+            if(!Teleportation_scroll.isItem(item)) return;
+            int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+            if(scrollLoc == null) return;
+            // teleports player to destination specified in the scroll
+            event.getPlayer().setInvulnerable(true);
+            // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+            // event.getPlayer().setWalkSpeed((float)1);
+            Block rmtsign = null;
+            Location location = new Location(event.getPlayer().getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+            rmtsign = location.getBlock();
+
+            if(rmtsign != null){
+                Location destination = isNearPortal(rmtsign.getLocation());
+                if(destination == null){
+                    return;
+                }
+                Teleport.te(event.getPlayer(), destination);
+                event.getPlayer().sendPlainMessage("Magic of the item in your hand dies down...");
+                event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.PAPER, 1));
+            }
+        }
+    }
     
-    // @EventHandler(ignoreCancelled = false)
-    // public void onItemUseAtEntity(EntityDamageByEntityEvent event){
-    //     Portal.getInstance().getLogger().info(event.getEventName());
-    //     if((event.getDamager() instanceof Player) && ((Player)event.getDamager()).getInventory().getItemInMainHand().getType() == Material.STICK){
-    //         Teleport.t(((Player)event.getDamager()));
-    //     }
-    // }
+    @EventHandler(ignoreCancelled = false)
+    public void onItemUseAtEntity(EntityDamageByEntityEvent event){
+        Portal.getInstance().getLogger().info(event.getEventName());
+        if((event.getDamager() instanceof Player) && (Teleportation_scroll.isItem(((Player)event.getDamager()).getInventory().getItemInMainHand()))){
+            Player p = (Player)event.getDamager();
+            // teleports player to destination specified in the scroll
+            ItemStack item = p.getInventory().getItemInMainHand();
+            if(!Teleportation_scroll.isItem(item)) return;
+            int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
+            if(scrollLoc == null) return;
+            // teleports player to destination specified in the scroll
+            p.setInvulnerable(true);
+            // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+            // p.setWalkSpeed((float)1);
+            Block rmtsign = null;
+            Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+            rmtsign = location.getBlock();
+
+            if(rmtsign != null){
+                Location destination = isNearPortal(rmtsign.getLocation());
+                if(destination == null){
+                    return;
+                }
+                Teleport.te(p, destination);
+                p.sendPlainMessage("Magic of the item in your hand dies down...");
+                p.getInventory().setItemInMainHand(new ItemStack(Material.PAPER, 1));
+            }
+        }
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onUseSign(PlayerInteractEvent event){
@@ -83,12 +118,6 @@ public class PortalListener implements Listener {
             // if stick is not connected to any portal yet
             if(stickloc == null){
                 BlockState st = event.getClickedBlock().getState();
-
-                // if(isNearPortal(st.getLocation()) != null){
-                //     event.getPlayer().sendPlainMessage("THE SIGN IS NEAR PORTAL");
-                // } else {
-                //     event.getPlayer().sendPlainMessage("THE SIGN IS NOT NEAR PORTAL");
-                // }
 
                 // if clicked on a sign near portal
                 if(st instanceof Sign && isNearPortal(st.getLocation()) != null && st instanceof TileState && (((Sign)st).getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY) == null)) {
@@ -144,6 +173,25 @@ public class PortalListener implements Listener {
                 }
             }
             event.setCancelled(true);
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && Teleportation_scroll.isItem(item)) {
+            // Player enchants a teleportation scroll
+            BlockState st = event.getClickedBlock().getState();
+            // if clicked on a sign near portal
+            if(st instanceof Sign && isNearPortal(st.getLocation()) != null && st instanceof TileState) {
+                event.getPlayer().sendPlainMessage("Magic flows in your hand...");
+                String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
+                event.getPlayer().sendPlainMessage(lines[0]);
+                ItemMeta meta = item.getItemMeta();
+                meta.lore(ImmutableList.of(TextHelpers.italicText(lines[0], NamedTextColor.RED)));
+                Location loc = st.getLocation();
+                int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
+                meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
+                item.setItemMeta(meta);
+                item.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
+            } else {
+                event.getPlayer().sendPlainMessage("Nothing happens...");
+            }
+
         }
     }
 
