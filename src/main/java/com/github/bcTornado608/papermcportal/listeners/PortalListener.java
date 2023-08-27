@@ -278,7 +278,7 @@ public class PortalListener implements Listener {
     public void onPlayerDeath(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             Player p = (Player) event.getEntity();
-            if(p.getHealth() < event.getDamage()) {
+            if(p.getHealth() <= event.getDamage()) {
                 ItemStack[] inv = p.getInventory().getStorageContents();
                 ItemStack it = p.getInventory().getItemInOffHand();
                 ItemStack[] itarm = p.getInventory().getArmorContents();
