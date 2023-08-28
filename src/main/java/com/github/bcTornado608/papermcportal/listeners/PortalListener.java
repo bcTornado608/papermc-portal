@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -31,6 +32,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
+import org.codehaus.plexus.util.cli.CommandLineTimeOutException;
 
 import com.github.bcTornado608.papermcportal.Portal;
 import com.github.bcTornado608.papermcportal.constants.CommonConstants;
@@ -40,6 +42,8 @@ import com.github.bcTornado608.papermcportal.items.Undying_scroll;
 import com.github.bcTornado608.papermcportal.utils.StringHash;
 import com.github.bcTornado608.papermcportal.utils.Teleport;
 import com.github.bcTornado608.papermcportal.utils.TextHelpers;
+import com.github.bcTornado608.papermcportal.utils.WorldDataType;
+import com.github.bcTornado608.papermcportal.utils.WorldWrapper;
 import com.google.common.collect.ImmutableList;
 
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,7 +71,7 @@ public class PortalListener implements Listener {
             if(scrollLoc == null) return;
             if(event.getPlayer().getTargetBlock(null, 30).getState() instanceof Sign) return;
             Block rmtsign = null;
-            Location location = new Location(event.getPlayer().getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+            Location location = new Location(Bukkit.getServer().getWorld(item.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
             rmtsign = location.getBlock();
             
             if(rmtsign != null){
@@ -76,15 +80,16 @@ public class PortalListener implements Listener {
                     return;
                 }
                 // teleports player to destination specified in the scroll
-                event.getPlayer().setInvulnerable(true);
+                // event.getPlayer().setInvulnerable(true);
                 // add negative effect for using scroll
                 Set<PotionEffect> effects = new HashSet<PotionEffect>();
-                effects.add(new PotionEffect(PotionEffectType.POISON, 20*5, 2));            
+                effects.add(new PotionEffect(PotionEffectType.POISON, 20*3, 2));            
                 effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*20, 2));            
                 effects.add(new PotionEffect(PotionEffectType.GLOWING, 20*60*2, 2));    
-                effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*5, 2));            
+                effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*4, 2));            
                 effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*60*2, 2));            
-                effects.add(new PotionEffect(PotionEffectType.WITHER, 20*10, 2));            
+                effects.add(new PotionEffect(PotionEffectType.WITHER, 20*6, 2)); 
+                effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20*30, 1));           
                 event.getPlayer().addPotionEffects(effects);
                 // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
                 // event.getPlayer().setWalkSpeed((float)1);
@@ -113,7 +118,7 @@ public class PortalListener implements Listener {
     //         // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
     //         // p.setWalkSpeed((float)1);
     //         Block rmtsign = null;
-    //         Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+    //         Location location = new Location(item.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
     //         rmtsign = location.getBlock();
 
     //         if(rmtsign != null){
@@ -156,6 +161,7 @@ public class PortalListener implements Listener {
                     Location loc = st.getLocation();
                     int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                     meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
+                    meta.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(event.getPlayer().getWorld().getUID()));
                     newitem.setItemMeta(meta);
                     newitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
                     // event.getPlayer().getInventory().addItem(newitem);
@@ -170,12 +176,13 @@ public class PortalListener implements Listener {
                 if(st instanceof Sign && isNearPortal(st.getLocation()) != null) {
                     String[] lines = ArrayUtils.addAll(((Sign)st).getSide(Side.FRONT).getLines(), ((Sign)st).getSide(Side.BACK).getLines());
                     TileState state = (TileState) signn.getState();
-                    Location location = new Location(event.getPlayer().getWorld(), stickloc[0], stickloc[1], stickloc[2], stickloc[3], stickloc[4]);
+                    Location location = new Location(Bukkit.getServer().getWorld(item.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), stickloc[0], stickloc[1], stickloc[2], stickloc[3], stickloc[4]);
                     // if sign matches and is not already occupied
                     if(stickloc[5] == StringHash.hash(lines[0]) && (state.getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY) == null) && !(location.getBlock().equals(st.getBlock()))){
                         /* setup the portal here */
                         // sets current sign state
                         state.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, stickloc);
+                        state.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(state.getWorld().getUID()));
                         state.update();
                         // sets remote sign state
                         Block rmtsign = location.getBlock();
@@ -187,6 +194,7 @@ public class PortalListener implements Listener {
                             int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
                             TileState rmtstate = (TileState) rmtsign.getState();
                             rmtstate.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, CURLOCATION);
+                            rmtstate.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(rmtstate.getWorld().getUID()));
                             rmtstate.update();
                         }
 
@@ -221,6 +229,7 @@ public class PortalListener implements Listener {
                 Location loc = st.getLocation();
                 int[] LOCATION = {(int)loc.getBlockX(), (int)loc.getBlockY(), (int)loc.getBlockZ(), (int)loc.getYaw(), (int)loc.getPitch(), StringHash.hash(lines[0])};
                 meta.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, LOCATION);
+                meta.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(event.getPlayer().getWorld().getUID()));
                 newitem.setItemMeta(meta);
                 newitem.addUnsafeEnchantment(Enchantment.LUCK, 1);
                 // event.getPlayer().getInventory().addItem(newitem);
@@ -249,7 +258,7 @@ public class PortalListener implements Listener {
                 if(locArr == null){
                     return;
                 }
-                Location location = new Location(event.getPlayer().getWorld(), locArr[0], locArr[1], locArr[2], locArr[3], locArr[4]);
+                Location location = new Location(Bukkit.getServer().getWorld(((TileState)st).getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), locArr[0], locArr[1], locArr[2], locArr[3], locArr[4]);
                 rmtsign = location.getBlock();
             }
             if(rmtsign != null){
@@ -257,19 +266,19 @@ public class PortalListener implements Listener {
                 if(destination == null){
                     return;
                 }
-                event.getPlayer().setInvulnerable(true);
+                // event.getPlayer().setInvulnerable(true);
                 // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
                 // event.getPlayer().setWalkSpeed((float)1);
                 Teleport.te(event.getPlayer(), destination);
+                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20*30, 1));
                 event.getPlayer().sendPlainMessage("You stepped into a portal connected to magic web...");
             }
         } else if (blklocprev.getBlock().getType() == Material.LAVA && blkloc.getBlock().getType() != Material.LAVA){
             Block sign = (isInPortal(blkloc) == null) ? isInPortal(blklocprev) : isInPortal(blkloc);
             if(sign == null) return;
 
-            event.getPlayer().setInvulnerable(false);
+            // event.getPlayer().setInvulnerable(false);
             event.getPlayer().setFireTicks(0);
-            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 360, 1));
             // event.getPlayer().setWalkSpeed((float)0.2);
         }
     }
@@ -289,7 +298,7 @@ public class PortalListener implements Listener {
                         if(scrollLoc == null) continue;
                         // teleports player to destination specified in the scroll
                         Block rmtsign = null;
-                        Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                        Location location = new Location(Bukkit.getServer().getWorld(is.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                         rmtsign = location.getBlock();
                         
                         if(rmtsign != null){
@@ -298,11 +307,12 @@ public class PortalListener implements Listener {
                                 return;
                             }
                             Teleport.te(p, destination);
-                            p.setInvulnerable(true);
+                            // p.setInvulnerable(true);
                             // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
                             // p.setWalkSpeed((float)1);
                             p.setHealth(0.5);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
+                            p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20*30, 1));
                             p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*60*2, 5));
                             p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
                         }
@@ -318,7 +328,7 @@ public class PortalListener implements Listener {
                         if(scrollLoc == null) continue;
                         // teleports player to destination specified in the scroll
                         Block rmtsign = null;
-                        Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                        Location location = new Location(Bukkit.getServer().getWorld(is.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                         rmtsign = location.getBlock();
                         
                         if(rmtsign != null){
@@ -327,7 +337,7 @@ public class PortalListener implements Listener {
                                 return;
                             }
                             Teleport.te(p, destination);
-                            p.setInvulnerable(true);
+                            // p.setInvulnerable(true);
                             // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
                             // p.setWalkSpeed((float)1);
                             p.setHealth(0.5);
@@ -345,7 +355,7 @@ public class PortalListener implements Listener {
                     if(scrollLoc == null) return;
                     // teleports player to destination specified in the scroll
                     Block rmtsign = null;
-                    Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
+                    Location location = new Location(Bukkit.getServer().getWorld(it.getItemMeta().getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()).getWorld()), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                     rmtsign = location.getBlock();
                     
                     if(rmtsign != null){
@@ -354,7 +364,7 @@ public class PortalListener implements Listener {
                             return;
                         }
                         Teleport.te(p, destination);
-                        p.setInvulnerable(true);
+                        // p.setInvulnerable(true);
                         // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
                         // p.setWalkSpeed((float)1);
                         p.setHealth(0.5);
