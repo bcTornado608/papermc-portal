@@ -182,7 +182,7 @@ public class PortalListener implements Listener {
                         /* setup the portal here */
                         // sets current sign state
                         state.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, stickloc);
-                        state.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(state.getWorld().getUID()));
+                        state.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), met.getPersistentDataContainer().get(CommonConstants.WORLD_STORE_KEY, new WorldDataType()));
                         state.update();
                         // sets remote sign state
                         Block rmtsign = location.getBlock();
@@ -194,7 +194,7 @@ public class PortalListener implements Listener {
                             int[] CURLOCATION = {(int)curLoc.getBlockX(), (int)curLoc.getBlockY(), (int)curLoc.getBlockZ(), (int)curLoc.getYaw(), (int)curLoc.getPitch(), stickloc[5]};
                             TileState rmtstate = (TileState) rmtsign.getState();
                             rmtstate.getPersistentDataContainer().set(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY, CURLOCATION);
-                            rmtstate.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(rmtstate.getWorld().getUID()));
+                            rmtstate.getPersistentDataContainer().set(CommonConstants.WORLD_STORE_KEY, new WorldDataType(), new WorldWrapper(state.getWorld().getUID()));
                             rmtstate.update();
                         }
 
