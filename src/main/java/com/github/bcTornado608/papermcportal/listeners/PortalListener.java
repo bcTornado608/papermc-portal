@@ -66,28 +66,28 @@ public class PortalListener implements Listener {
             int[] scrollLoc = item.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
             if(scrollLoc == null) return;
             if(event.getPlayer().getTargetBlock(null, 30).getState() instanceof Sign) return;
-            // teleports player to destination specified in the scroll
-            event.getPlayer().setInvulnerable(true);
-            // add negative effect for using scroll
-            Set<PotionEffect> effects = new HashSet<PotionEffect>();
-            effects.add(new PotionEffect(PotionEffectType.POISON, 20*5, 2));            
-            effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*20, 2));            
-            effects.add(new PotionEffect(PotionEffectType.GLOWING, 20*60*2, 2));    
-            effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*5, 2));            
-            effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*60*2, 2));            
-            effects.add(new PotionEffect(PotionEffectType.WITHER, 20*10, 2));            
-            event.getPlayer().addPotionEffects(effects);
-            // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-            // event.getPlayer().setWalkSpeed((float)1);
             Block rmtsign = null;
             Location location = new Location(event.getPlayer().getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
             rmtsign = location.getBlock();
-
+            
             if(rmtsign != null){
                 Location destination = isNearPortal(rmtsign.getLocation());
                 if(destination == null){
                     return;
                 }
+                // teleports player to destination specified in the scroll
+                event.getPlayer().setInvulnerable(true);
+                // add negative effect for using scroll
+                Set<PotionEffect> effects = new HashSet<PotionEffect>();
+                effects.add(new PotionEffect(PotionEffectType.POISON, 20*5, 2));            
+                effects.add(new PotionEffect(PotionEffectType.DARKNESS, 20*20, 2));            
+                effects.add(new PotionEffect(PotionEffectType.GLOWING, 20*60*2, 2));    
+                effects.add(new PotionEffect(PotionEffectType.LEVITATION, 20*5, 2));            
+                effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 20*60*2, 2));            
+                effects.add(new PotionEffect(PotionEffectType.WITHER, 20*10, 2));            
+                event.getPlayer().addPotionEffects(effects);
+                // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                // event.getPlayer().setWalkSpeed((float)1);
                 Teleport.te(event.getPlayer(), destination);
                 event.getPlayer().sendPlainMessage("Magic of the item in your hand dies down...");
                 ItemStack mhItem = event.getPlayer().getInventory().getItemInMainHand();
@@ -242,9 +242,6 @@ public class PortalListener implements Listener {
         if(blkloc.getBlock().getType() == Material.LAVA && blklocprev.getBlock().getType() != Material.LAVA){
             Block sign = (isInPortal(blkloc) == null) ? isInPortal(blklocprev) : isInPortal(blkloc);
             if(sign == null) return;    
-            event.getPlayer().setInvulnerable(true);
-            // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-            // event.getPlayer().setWalkSpeed((float)1);
             BlockState st = sign.getState();
             Block rmtsign = null;
             if(st instanceof TileState){
@@ -260,6 +257,9 @@ public class PortalListener implements Listener {
                 if(destination == null){
                     return;
                 }
+                event.getPlayer().setInvulnerable(true);
+                // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                // event.getPlayer().setWalkSpeed((float)1);
                 Teleport.te(event.getPlayer(), destination);
                 event.getPlayer().sendPlainMessage("You stepped into a portal connected to magic web...");
             }
@@ -288,19 +288,19 @@ public class PortalListener implements Listener {
                         int[] scrollLoc = is.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
                         if(scrollLoc == null) continue;
                         // teleports player to destination specified in the scroll
-                        p.setInvulnerable(true);
-                        // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-                        // p.setWalkSpeed((float)1);
                         Block rmtsign = null;
                         Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                         rmtsign = location.getBlock();
-
+                        
                         if(rmtsign != null){
                             Location destination = isNearPortal(rmtsign.getLocation());
                             if(destination == null){
                                 return;
                             }
                             Teleport.te(p, destination);
+                            p.setInvulnerable(true);
+                            // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                            // p.setWalkSpeed((float)1);
                             p.setHealth(0.5);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
                             p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 20*60*2, 5));
@@ -317,19 +317,19 @@ public class PortalListener implements Listener {
                         int[] scrollLoc = is.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
                         if(scrollLoc == null) continue;
                         // teleports player to destination specified in the scroll
-                        p.setInvulnerable(true);
-                        // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-                        // p.setWalkSpeed((float)1);
                         Block rmtsign = null;
                         Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                         rmtsign = location.getBlock();
-
+                        
                         if(rmtsign != null){
                             Location destination = isNearPortal(rmtsign.getLocation());
                             if(destination == null){
                                 return;
                             }
                             Teleport.te(p, destination);
+                            p.setInvulnerable(true);
+                            // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                            // p.setWalkSpeed((float)1);
                             p.setHealth(0.5);
                             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
                             p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
@@ -344,19 +344,19 @@ public class PortalListener implements Listener {
                     int[] scrollLoc = it.getItemMeta().getPersistentDataContainer().get(CommonConstants.LOC_STORE_KEY, PersistentDataType.INTEGER_ARRAY);
                     if(scrollLoc == null) return;
                     // teleports player to destination specified in the scroll
-                    p.setInvulnerable(true);
-                    // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
-                    // p.setWalkSpeed((float)1);
                     Block rmtsign = null;
                     Location location = new Location(p.getWorld(), scrollLoc[0], scrollLoc[1], scrollLoc[2], scrollLoc[3], scrollLoc[4]);
                     rmtsign = location.getBlock();
-
+                    
                     if(rmtsign != null){
                         Location destination = isNearPortal(rmtsign.getLocation());
                         if(destination == null){
                             return;
                         }
                         Teleport.te(p, destination);
+                        p.setInvulnerable(true);
+                        // p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
+                        // p.setWalkSpeed((float)1);
                         p.setHealth(0.5);
                         p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20*60*2, 2));
                         p.sendPlainMessage("Your scroll of undying breaks, you can feel the magic aura around you died down.");
