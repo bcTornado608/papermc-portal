@@ -1,5 +1,6 @@
 # papermc-portal
-A bunch of portal-related cool items and mysteries!
+A bunch of portal-related cool items and mysteries!  
+Minecraft version 1.20.1 vanilla
 
 PORTALLL AWAY!!!
 
@@ -52,7 +53,7 @@ The teleportation scroll will then disappear.
 
 ### Using scroll of undying
 To use scroll of undying, simply right click with it on a sign next to a portal.
-Then, simply put it in your inventory (you don't have to hold it in your off hand).  
+Then, put it in your inventory (you don't have to hold it in your off hand).  
 
 When your health bar fully depletes, you will be teleported back to the portal, and be assigned 2 minutes of regen and absorption.  
 The scroll of undying will then turn back to normal paper.
