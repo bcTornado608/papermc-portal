@@ -32,7 +32,7 @@ S  S  S  S  S
 
 Stairs can be made of any material (better not be wood), lava doesn't have to be still lava.
 
-Put a sign next to the structure to complete the portal (so that standing in the portal doesn't get burnt).
+Put a sign next to the structure to complete the portal.
 
 
 ### Connecting Two Portals
